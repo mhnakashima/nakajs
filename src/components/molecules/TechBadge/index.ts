@@ -1,0 +1,1 @@
+export { TechBadge } from './TechBadge';
