@@ -1,22 +1,58 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import emailjs from '@emailjs/browser';
 import { useI18n } from '@/context/I18nContext';
 import { createContactSchema, COOLDOWN_MS } from '@/schemas/contactSchema';
 import type { ContactFormData } from '@/schemas/contactSchema';
-import { UserIcon, MessageIcon, SendIcon, DownloadIcon, EmailIcon } from '@/components/icons';
+import { UserIcon, MessageIcon, SendIcon, DownloadIcon, EmailIcon, CheckIcon } from '@/components/icons';
 import { ContactLinksGrid } from '@molecules/ContactLinks';
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? '';
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? '';
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? '';
 
+const SUCCESS_DISPLAY_MS = 2000;
+
 type SubmitStatus = 'idle' | 'sending' | 'success' | 'error';
+
+function SubmitButton({ status, label, successLabel }: { status: SubmitStatus; label: string; successLabel: string }) {
+  return (
+    <div className="flex items-center justify-end gap-3">
+      {status === 'success' && (
+        <span
+          role="status"
+          className="text-sm text-green-700 font-['Lato',sans-serif] animate-fade-in-up"
+        >
+          {successLabel}
+        </span>
+      )}
+      <button
+        type="submit"
+        disabled={status === 'sending' || status === 'success'}
+        className="inline-flex items-center gap-2 text-[#888] hover:text-[#0A0A0A] transition-colors disabled:cursor-not-allowed"
+        aria-label={label}
+      >
+        {status === 'sending' && (
+          <span className="w-4 h-4 border-2 border-[#888] border-t-transparent rounded-full animate-spin" />
+        )}
+        {status === 'success' && (
+          <span className="text-green-700">
+            <CheckIcon />
+          </span>
+        )}
+        {(status === 'idle' || status === 'error') && (
+          <SendIcon />
+        )}
+      </button>
+    </div>
+  );
+}
 
 export default function ContactPage() {
   const { t, locale } = useI18n();
   const [status, setStatus] = useState<SubmitStatus>('idle');
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const schema = useMemo(() => createContactSchema(t), [t, locale]);
 
@@ -31,6 +67,19 @@ export default function ContactPage() {
   });
 
   const [lastSentAt, setLastSentAt] = useState(0);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
+
+  const showSuccess = useCallback(() => {
+    setStatus('success');
+    successTimerRef.current = setTimeout(() => {
+      setStatus('idle');
+    }, SUCCESS_DISPLAY_MS);
+  }, []);
 
   const onSubmit = useCallback(
     async (data: ContactFormData) => {
@@ -48,9 +97,9 @@ export default function ContactPage() {
         const subject = encodeURIComponent(`Portfolio Contact from ${data.name}`);
         const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`);
         window.open(`mailto:mhnakashima@gmail.com?subject=${subject}&body=${body}`, '_blank');
-        setStatus('success');
         setLastSentAt(now);
         reset();
+        showSuccess();
         return;
       }
 
@@ -65,14 +114,14 @@ export default function ContactPage() {
           },
           EMAILJS_PUBLIC_KEY,
         );
-        setStatus('success');
         setLastSentAt(now);
         reset();
+        showSuccess();
       } catch {
         setStatus('error');
       }
     },
-    [reset, lastSentAt],
+    [reset, lastSentAt, showSuccess],
   );
 
   return (
@@ -163,27 +212,13 @@ export default function ContactPage() {
             )}
           </div>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={status === 'sending'}
-              className="inline-flex items-center gap-2 text-[#888] hover:text-[#0A0A0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label={t('contact.send')}
-            >
-              {status === 'sending' ? (
-                <span className="w-4 h-4 border-2 border-[#888] border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <SendIcon />
-              )}
-            </button>
-          </div>
+          <SubmitButton
+            status={status}
+            label={t('contact.send')}
+            successLabel={t('contact.success')}
+          />
         </form>
 
-        {status === 'success' && (
-          <p role="status" className="mt-4 text-sm text-green-700 font-['Lato',sans-serif]">
-            {t('contact.success')}
-          </p>
-        )}
         {status === 'error' && (
           <p role="alert" className="mt-4 text-sm text-red-600 font-['Lato',sans-serif]">
             {t('contact.error')}

@@ -13,3 +13,4 @@ export { MailIcon } from './MailIcon';
 export { HelpIcon } from './HelpIcon';
 export { ChevronIcon } from './ChevronIcon';
 export { ExternalLinkIcon } from './ExternalLinkIcon';
+export { CheckIcon } from './CheckIcon';
