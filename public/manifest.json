@@ -1,0 +1,16 @@
+{
+  "name": "Michael Nakashima | Naka",
+  "short_name": "Naka",
+  "description": "Front-end Engineer portfolio — React, TypeScript, modern web",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0A0A0A",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

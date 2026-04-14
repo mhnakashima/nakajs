@@ -76,6 +76,16 @@ export type TranslationKeys = {
   'faq.a9': string;
   'faq.q10': string;
   'faq.a10': string;
+  'meta.about.title': string;
+  'meta.about.description': string;
+  'meta.experience.title': string;
+  'meta.experience.description': string;
+  'meta.portfolio.title': string;
+  'meta.portfolio.description': string;
+  'meta.contact.title': string;
+  'meta.contact.description': string;
+  'meta.faq.title': string;
+  'meta.faq.description': string;
 };
 
 export type Translations = Record<Locale, TranslationKeys>;

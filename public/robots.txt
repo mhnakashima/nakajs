@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nakajs.vercel.app/sitemap.xml

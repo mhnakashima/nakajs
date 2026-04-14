@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { usePageMeta } from '@hooks/usePageMeta';
 
 const AboutPage = lazy(() => import('@pages/About/About'));
 const ExperiencePage = lazy(() => import('@pages/Experience/Experience'));
@@ -20,6 +21,8 @@ function PageFallback() {
 }
 
 export function AppRoutes() {
+  usePageMeta();
+
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
