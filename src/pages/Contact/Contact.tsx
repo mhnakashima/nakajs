@@ -239,7 +239,7 @@ export default function ContactPage() {
         </h3>
 
         <a
-          href="/docs/michael-nakashima-cv-2026.docx"
+          href="/docs/michael_nakashima_cv_2026.pdf"
           download
           className="inline-flex items-center gap-3 text-[#0A0A0A] no-underline transition-colors hover:text-[#666] focus-visible:outline-2 focus-visible:outline-[#0A0A0A] focus-visible:outline-offset-4 focus-visible:rounded-sm"
           aria-label={`Download ${t('contact.cvFile')}`}
